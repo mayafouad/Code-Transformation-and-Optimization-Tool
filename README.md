@@ -107,9 +107,6 @@ Expands small loops into repeated statements, reducing loop control overhead.
 ### 7. Common Subexpression Elimination (`CommonSubexpressionEliminator`)
 Removes redundant computations by storing results in temporary variables and reusing them.
 
-### 8. Strength Reduction (`StrengthReducer`)
-Replaces expensive operations (e.g., multiplication) with cheaper ones (e.g., addition) in loops.
-
 ### 9. Code Hoisting (`CodeHoister`)
 Moves loop-invariant code (expressions independent of the loop variable) outside the loop to avoid redundant execution.
 
