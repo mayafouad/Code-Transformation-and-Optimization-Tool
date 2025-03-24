@@ -24,7 +24,7 @@ public class CodeHoister extends CodeTransformer {
                 if (!line.isEmpty() && !line.contains(loopVar) && line.matches(".*=.*;")) {
                     hoistedLines.add(line);
                 } else {
-                    newBodyLines.add(line);
+                    newBodyLines.add("    " + line);
                 }
             }
 

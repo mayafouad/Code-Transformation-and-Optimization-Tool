@@ -59,7 +59,6 @@ public class CodeOptimizerService {
         transformers.add(new FunctionInliner());
         transformers.add(new LoopUnroller());
         transformers.add(new CommonSubexpressionEliminator());
-        transformers.add(new StrengthReducer());
         transformers.add(new CodeHoister());
         return transformers;
     }

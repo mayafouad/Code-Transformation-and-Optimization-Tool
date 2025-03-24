@@ -1,7 +1,9 @@
 package com.example.cppoptimizer.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +12,7 @@ public class MemoryAllocationOptimizer extends CodeTransformer {
     public String transform(String code, CodeOptimizerService.Language lang) {
         String[] lines = code.split("\n");
         List<String> newLines = new ArrayList<>();
+        Set<String> convertedArrays = new HashSet<>();
 
         Pattern mallocPattern = Pattern.compile("(\\w+)\\s*=\\s*\\(\\w+\\*\\)\\s*malloc\\s*\\(\\s*(\\d+)\\s*\\*\\s*sizeof\\s*\\(\\s*\\w+\\s*\\)\\s*\\);");
         Pattern newPattern = Pattern.compile("(\\w+)\\s*=\\s*new\\s+\\w+\\s*\\[\\s*(\\d+)\\s*\\];");
@@ -23,7 +26,7 @@ public class MemoryAllocationOptimizer extends CodeTransformer {
                 int size = Integer.parseInt(mallocMatcher.group(2));
                 if (size <= 10) {
                     newLines.add("int " + varName + "[" + size + "];");
-                    code = code.replaceAll("free\\s*\\(\\s*" + varName + "\\s*\\);", "");
+                    convertedArrays.add(varName);
                 } else {
                     newLines.add(line);
                 }
@@ -32,11 +35,11 @@ public class MemoryAllocationOptimizer extends CodeTransformer {
                 int size = Integer.parseInt(newMatcher.group(2));
                 if (size <= 10) {
                     newLines.add("int " + varName + "[" + size + "];");
-                    code = code.replaceAll("delete\\s*\\[\\s*\\]\\s*" + varName + "\\s*;", "");
+                    convertedArrays.add(varName);
                 } else {
                     newLines.add(line);
                 }
-            } else {
+            } else if (!convertedArrays.contains(line.trim().replaceAll("delete\\s*\\[\\s*\\]\\s*(\\w+)\\s*;", "$1"))) {
                 newLines.add(line);
             }
         }

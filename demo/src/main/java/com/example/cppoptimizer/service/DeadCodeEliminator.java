@@ -1,7 +1,9 @@
 package com.example.cppoptimizer.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,36 +12,34 @@ public class DeadCodeEliminator extends CodeTransformer {
     public String transform(String code, CodeOptimizerService.Language lang) {
         String[] lines = code.split("\n");
         List<String> newLines = new ArrayList<>();
-        List<String> variables = new ArrayList<>();
-        List<String> usedVariables = new ArrayList<>();
+        Map<String, Integer> variableUsageCount = new HashMap<>();
 
-        Pattern varPattern = Pattern.compile("(int|float|double|char)\\s+(\\w+)(\\s*=\\s*[^;]+)?;");
+        // Step 1: Count occurrences of each variable
+        Pattern varPattern = Pattern.compile("(int|float|double|char)\\s+(\\w+)\\s*(=\\s*[^;]+)?\\s*;");
         for (String line : lines) {
-            Matcher matcher = varPattern.matcher(line);
-            if (matcher.find()) {
-                variables.add(matcher.group(2));
-            }
-        }
-
-        for (String line : lines) {
-            for (String var : variables) {
-                if (line.contains(var) && !line.matches(".*(int|float|double|char)\\s+" + var + "(\\s*=\\s*[^;]+)?;.*")) {
-                    usedVariables.add(var);
-                }
-            }
-        }
-
-        for (String line : lines) {
-            boolean keep = true;
-            Matcher matcher = varPattern.matcher(line);
+            Matcher matcher = varPattern.matcher(line.trim());
             if (matcher.find()) {
                 String varName = matcher.group(2);
-                if (!usedVariables.contains(varName)) {
-                    keep = false;
+                variableUsageCount.put(varName, variableUsageCount.getOrDefault(varName, 0) + 1);
+            }
+            // Count usages outside declarations
+            for (String word : line.split("\\W+")) {
+                if (variableUsageCount.containsKey(word) && !line.matches(".*(int|float|double|char)\\s+" + word + "\\s*(=\\s*[^;]+)?\\s*;.*")) {
+                    variableUsageCount.put(word, variableUsageCount.get(word) + 1);
                 }
             }
-            if (keep) {
-                newLines.add(line);
+        }
+
+        // Step 2: Keep only lines with variables used more than once or non-declaration lines
+        for (String line : lines) {
+            Matcher matcher = varPattern.matcher(line.trim());
+            if (matcher.find()) {
+                String varName = matcher.group(2);
+                if (variableUsageCount.get(varName) > 1) { // Used more than once (declaration + at least one use)
+                    newLines.add(line);
+                }
+            } else {
+                newLines.add(line); // Keep non-declaration lines
             }
         }
 
@@ -48,7 +48,7 @@ public class DeadCodeEliminator extends CodeTransformer {
 
     @Override
     public String getInsight() {
-        return "Eliminated unused variables (dead code).";
+        return "Eliminated variables declared but not used elsewhere (dead code).";
     }
 
     @Override

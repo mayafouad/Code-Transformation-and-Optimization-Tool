@@ -28,7 +28,10 @@ public class CodeOptimizerController {
         }
 
         try {
-            String originalCode = new String(file.getBytes(), StandardCharsets.UTF_8);
+            // Read the file and normalize line endings to \n
+            String originalCode = new String(file.getBytes(), StandardCharsets.UTF_8)
+                    .replaceAll("\r\n", "\n") // Convert Windows line endings
+                    .replaceAll("\r", "\n");  // Convert old Mac line endings
             CodeOptimizerService.OptimizationResult result = codeOptimizerService.optimize(originalCode);
 
             model.addAttribute("originalCode", originalCode);
@@ -36,7 +39,7 @@ public class CodeOptimizerController {
             model.addAttribute("beforeMemory", result.getBeforeMemory());
             model.addAttribute("afterMemory", result.getAfterMemory());
             model.addAttribute("timingEntries", result.getTimingEntries());
-            model.addAttribute("optimizationInsights", result.getOptimizationInsights()); // Add insights
+            model.addAttribute("optimizationInsights", result.getOptimizationInsights());
         } catch (IOException e) {
             model.addAttribute("error", "Error reading the file: " + e.getMessage());
         }

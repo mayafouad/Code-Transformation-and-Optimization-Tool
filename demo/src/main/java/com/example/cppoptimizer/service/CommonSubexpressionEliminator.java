@@ -1,7 +1,9 @@
 package com.example.cppoptimizer.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +12,7 @@ public class CommonSubexpressionEliminator extends CodeTransformer {
     public String transform(String code, CodeOptimizerService.Language lang) {
         String[] lines = code.split("\n");
         List<String> newLines = new ArrayList<>();
+        Set<String> declaredVars = new HashSet<>();
 
         Pattern exprPattern = Pattern.compile("(\\w+)\\s*=\\s*(\\w+\\s*\\*\\s*\\w+);");
         List<String> expressions = new ArrayList<>();
@@ -22,18 +25,32 @@ public class CommonSubexpressionEliminator extends CodeTransformer {
                 String expr = matcher.group(2);
                 int index = expressions.indexOf(expr);
                 if (index != -1) {
-                    newLines.add(var + " = " + tempVars.get(index) + ";");
-                    continue;
+                    if (!declaredVars.contains(var)) {
+                        newLines.add("int " + var + " = " + tempVars.get(index) + ";");
+                        declaredVars.add(var);
+                    } else {
+                        newLines.add(var + " = " + tempVars.get(index) + ";");
+                    }
                 } else {
                     String tempVar = "temp_" + expressions.size();
                     expressions.add(expr);
                     tempVars.add(tempVar);
                     newLines.add("int " + tempVar + " = " + expr + ";");
-                    newLines.add(var + " = " + tempVar + ";");
-                    continue;
+                    if (!declaredVars.contains(var)) {
+                        newLines.add("int " + var + " = " + tempVar + ";");
+                        declaredVars.add(var);
+                    } else {
+                        newLines.add(var + " = " + tempVar + ";");
+                    }
+                }
+            } else {
+                newLines.add(line);
+                Pattern varDecl = Pattern.compile("(int|float|double|char)\\s+(\\w+)\\s*(=.*)?;");
+                Matcher declMatcher = varDecl.matcher(line);
+                if (declMatcher.find()) {
+                    declaredVars.add(declMatcher.group(2));
                 }
             }
-            newLines.add(line);
         }
 
         return String.join("\n", newLines);
