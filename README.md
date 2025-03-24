@@ -1,4 +1,4 @@
-# ⚡Automated CTO Tool
+# ⚡CTO Tool
 
 ![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) 
 
