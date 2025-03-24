@@ -45,6 +45,8 @@ The **Automated CTO Tool** is a web-based application designed to assist develop
 3. **View Results**: The optimized code, memory usage, timing, and insights will be displayed on the page.
 
 ### Backend Usage (For Developers)
+
+### Using the CodeOptimizerService Directly
 Inject the `CodeOptimizerService` into your Spring components:
 ```java
 @Autowired
@@ -54,7 +56,34 @@ String code = "int main() { int a = 2 + 3; return 0; }";
 OptimizationResult result = optimizerService.optimize(code);
 System.out.println("Optimized Code: " + result.getOptimizedCode());
 ```
+### Using the API Endpoint
+You can also optimize code by sending a file via the `/optimize` API endpoint. This endpoint accepts a multipart file upload and returns the optimization results, which can be rendered in the web interface or processed further.
 
+#### Endpoint Details
+- **URL**: `/optimize`
+- **Method**: `POST`
+- **Content-Type**: `multipart/form-data`
+- **Request Parameter**:
+  - `file`: The C/C++ source file to optimize (e.g., a `.c` or `.cpp` file).
+- **Response**:
+  - Renders the `index` view with the following model attributes:
+    - `originalCode`: The original code from the uploaded file.
+    - `optimizedCode`: The optimized code.
+    - `beforeMemory`: Memory usage before optimization.
+    - `afterMemory`: Memory usage after optimization.
+    - `timingEntries`: Timing information for each optimization step.
+    - `optimizationInsights`: A list of insights describing the applied optimizations.
+
+#### Example Usage with a REST Client (e.g., Postman)
+1. Open Postman or your preferred REST client.
+2. Set the request method to `POST`.
+3. Set the URL to `http://localhost:8080/optimize`.
+4. In the "Body" tab, select `form-data`.
+5. Add a key named `file`, set its type to `File`, and upload your C/C++ source file (e.g., `code.cpp`).
+6. Send the request.
+7. The response will be an HTML page (`index.html`) containing the optimization results, including the original and optimized code, memory usage, timing, and insights.
+
+   
 ## Optimization Techniques
 
 ### 1. Constant Folding
@@ -143,4 +172,6 @@ Contributions are welcome! To contribute:
 
 ## Contact
 For questions or feedback, open an issue or reach out via GitHub: [mayafouad](https://github.com/mayafouad).
+
+
 
