@@ -1,13 +1,13 @@
-package com.example.demo;
+package com.example.cppoptimizer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
+public class CppOptimizerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(CppOptimizerApplication.class, args);
 	}
 
 }

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C/C++ Code Optimizer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Highlight.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+    <!-- Diff2Html CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html@3.4.35/bundles/css/diff2html.min.css">
+    <!-- Custom CSS to match VS Code Dark+ -->
+    <style>
+        body {
+            background-color: #000000; /* VS Code dark background */
+            color: #d4d4d4; /* VS Code default text color */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #3c3c3c;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        /* Override Highlight.js colors to match VS Code Dark+ */
+        .hljs {
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .hljs-keyword, .hljs-built_in {
+            color: #569cd6; /* Blue for keywords like int, for */
+        }
+        .hljs-string {
+            color: #ce9178; /* Peach for strings */
+        }
+        .hljs-number {
+            color: #b5cea8; /* Light green for numbers */
+        }
+        .hljs-comment {
+            color: #6a9955; /* Green for comments */
+        }
+        .hljs-preprocessor, .hljs-pragma {
+            color: #569cd6; /* Blue for preprocessor directives */
+        }
+        .hljs-identifier, .hljs-variable {
+            color: #d4d4d4; /* Light gray for variables/identifiers */
+        }
+        .container {
+            max-width: 900px;
+        }
+        .header {
+            border-bottom: 2px solid #71bbe3;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            color: #71bbe3;
+        }
+        .form-label {
+            color: #d4d4d4;
+        }
+        .form-control, .btn {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border-color: #3c3c3c;
+        }
+        .form-control:focus {
+            background-color: #2d2d2d;
+            color: #d4d4d4;
+            border-color: #568dc9;
+            box-shadow: 0 0 5px rgba(39, 56, 75, 0.5);
+        }
+        .btn-primary {
+            color: white;
+            background-color: #568dc9;
+            border-color: #568dc9;
+        }
+        .btn-primary:hover {
+            background-color: #517499;
+            border-color: #517499;
+        }
+        .btn-success {
+            background-color: #49a290;
+            border-color: #49a290;
+        }
+        .btn-success:hover {
+            background-color: #2b7264;
+            border-color: #2b7264;
+        }
+        h1, h2, h3, h4 {
+            color: #d4d4d4;
+        }
+        .text-secondary {
+            color: #9cdcfe !important; /* VS Code secondary text (lighter blue) */
+        }
+        .text-success {
+            color: #4ec9b0 !important; /* VS Code success color (teal) */
+        }
+        .alert-danger {
+            background-color: #3c3c3c;
+            color: #f44747;
+            border-color: #f44747;
+        }
+        .visualization-section, .timing-section, .insights-section {
+            margin-top: 30px;
+        }
+        canvas {
+            background-color: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 5px;
+            max-width: 100%;
+        }
+        .table-dark {
+            background-color: #1e1e1e;
+            border: 1px solid #3c3c3c;
+        }
+        .table-dark th, .table-dark td {
+            border-color: #3c3c3c;
+            color: #d4d4d4;
+        }
+        .table-dark th {
+            background-color: #2d2d2d;
+        }
+        .list-group-item {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-color: #3c3c3c;
+        }
+        /* Diff2Html Styling */
+        .d2h-file-diff {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .d2h-code-line {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        .d2h-del {
+            background-color: #f44747 !important;
+        }
+        .d2h-ins {
+            background-color: #4ec9b0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Header -->
+        <h1 class="header">C/C++ Code Optimizer</h1>
+
+        <!-- Upload Form -->
+        <form id="uploadForm" method="post" enctype="multipart/form-data" th:action="@{/optimize}" class="mb-5">
+            <div class="mb-3">
+                <label for="file" class="form-label">Upload your C/C++ file:</label>
+                <input type="file" name="file" id="file" accept=".c,.cpp" class="form-control" />
+            </div>
+            <button type="submit" id="optimizeButton" class="btn btn-primary">Optimize Code</button>
+        </form>
+
+        <!-- Display Results -->
+        <div id="results" th:if="${optimizedCode}" class="row">
+            <!-- Code View and Diff View -->
+            <div class="col-md-12 mb-4">
+                <div id="codeView" class="row">
+                    <!-- Original Code -->
+                    <div class="col-md-6 mb-4">
+                        <h3 class="text-secondary">Original Code</h3>
+                        <pre class="code-block"><code class="language-cpp" id="originalCode" contenteditable="true" th:text="${originalCode}"></code></pre>
+                        <!-- Button to optimize edited code -->
+                        <button id="optimizeEditedButton" class="btn btn-primary mt-3">Optimize Edited Code</button>
+                    </div>
+                    <!-- Optimized Code -->
+                    <div class="col-md-6 mb-4">
+                        <h3 class="text-success">Optimized Code</h3>
+                        <pre class="code-block"><code class="language-cpp" id="optimizedCode" th:text="${optimizedCode}"></code></pre>
+                        <!-- Download Form -->
+                        <form th:action="@{/download}" method="get" class="mt-3">
+                            <div class="input-group">
+                                <input type="hidden" name="code" id="downloadCode" th:value="${optimizedCode}" />
+                                <input type="text" name="filename" class="form-control" placeholder="Enter filename (e.g., optimized.cpp)" value="optimized.cpp" />
+                                <button type="submit" class="btn btn-success">Download</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optimization Insights -->
+            <div class="insights-section col-12" th:if="${optimizationInsights}">
+                <h2>Optimization Insights</h2>
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="insight : ${optimizationInsights}" th:text="${insight}"></li>
+                </ul>
+            </div>
+
+            <!-- Memory Usage Visualization -->
+            <div class="visualization-section col-12">
+                <h2>Memory Usage Visualization</h2>
+                <canvas id="memoryChart" width="800" height="500"></canvas>
+                <script th:inline="javascript">
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const canvas = document.getElementById('memoryChart');
+                        const ctx = canvas.getContext('2d');
+
+                        // Memory usage data from the server
+                        const beforeHeap = /*[[${beforeMemory.heapSize}]]*/ 0;
+                        const beforeStack = /*[[${beforeMemory.stackSize}]]*/ 0;
+                        const afterHeap = /*[[${afterMemory.heapSize}]]*/ 0;
+                        const afterStack = /*[[${afterMemory.stackSize}]]*/ 0;
+
+                        // Chart dimensions and styling
+                        const barWidth = 60;
+                        const barSpacing = 40;
+                        const maxHeight = 300;
+                        const xOffset = 100;
+                        const yOffset = 400;
+                        const fontSize = 14;
+                        const labelFont = `bold ${fontSize}px Arial`;
+                        const axisFont = `${fontSize}px Arial`;
+
+                        // Calculate scaling factor
+                        const maxSize = Math.max(beforeHeap, beforeStack, afterHeap, afterStack) || 1;
+                        const scale = maxHeight / maxSize;
+
+                        // Clear canvas with dark background
+                        ctx.fillStyle = '#1e1e1e';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        // Title
+                        ctx.font = 'bold 16px Arial';
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('Memory Usage Before and After Optimization', canvas.width / 2, 30);
+
+                        // Draw y-axis and scale markers
+                        ctx.strokeStyle = '#d4d4d4';
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.font = axisFont;
+                        ctx.textAlign = 'right';
+                        ctx.beginPath();
+                        ctx.moveTo(xOffset - 10, yOffset);
+                        ctx.lineTo(xOffset - 10, yOffset - maxHeight - 10);
+                        ctx.stroke();
+
+                        // Add y-axis scale markers
+                        for (let i = 0; i <= 4; i++) {
+                            const y = yOffset - (i * maxHeight / 4);
+                            const value = Math.round((i * maxSize / 4));
+                            ctx.fillText(value, xOffset - 20, y + 5);
+                            ctx.beginPath();
+                            ctx.moveTo(xOffset - 15, y);
+                            ctx.lineTo(xOffset - 5, y);
+                            ctx.stroke();
+                        }
+                        ctx.textAlign = 'center';
+                        ctx.fillText('Memory (bytes)', xOffset - 60, yOffset - maxHeight / 2);
+
+                        // Draw x-axis
+                        ctx.beginPath();
+                        ctx.moveTo(xOffset - 10, yOffset);
+                        ctx.lineTo(xOffset + 400, yOffset);
+                        ctx.stroke();
+
+                        // Draw "Before" bars
+                        ctx.font = labelFont;
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.fillText('Before', xOffset + (barWidth + barSpacing) / 2, 60);
+
+                        // Heap (Before) - Red
+                        ctx.fillStyle = '#ff5555';
+                        const heapHeightBefore = beforeHeap * scale;
+                        const heapXBefore = xOffset;
+                        ctx.fillRect(heapXBefore, yOffset - heapHeightBefore, barWidth, heapHeightBefore);
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.save();
+                        ctx.translate(heapXBefore + barWidth / 2, yOffset + 20);
+                        ctx.rotate(-Math.PI / 4);
+                        ctx.fillText(`Heap: ${beforeHeap} bytes`, 0, 0);
+                        ctx.restore();
+
+                        // Stack (Before) - Blue
+                        ctx.fillStyle = '#569cd6';
+                        const stackHeightBefore = beforeStack * scale;
+                        const stackXBefore = xOffset + barWidth + barSpacing;
+                        ctx.fillRect(stackXBefore, yOffset - stackHeightBefore, barWidth, stackHeightBefore);
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.save();
+                        ctx.translate(stackXBefore + barWidth / 2, yOffset + 20);
+                        ctx.rotate(-Math.PI / 4);
+                        ctx.fillText(`Stack: ${beforeStack} bytes`, 0, 0);
+                        ctx.restore();
+
+                        // Draw "After" bars
+                        ctx.font = labelFont;
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.fillText('After', xOffset + (barWidth + barSpacing) / 2 + 200, 60);
+
+                        // Heap (After) - Red
+                        ctx.fillStyle = '#ff5555';
+                        const heapHeightAfter = afterHeap * scale;
+                        const heapXAfter = xOffset + 200;
+                        ctx.fillRect(heapXAfter, yOffset - heapHeightAfter, barWidth, heapHeightAfter);
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.save();
+                        ctx.translate(heapXAfter + barWidth / 2, yOffset + 20);
+                        ctx.rotate(-Math.PI / 4);
+                        ctx.fillText(`Heap: ${afterHeap} bytes`, 0, 0);
+                        ctx.restore();
+
+                        // Stack (After) - Blue
+                        ctx.fillStyle = '#569cd6';
+                        const stackHeightAfter = afterStack * scale;
+                        const stackXAfter = xOffset + 200 + barWidth + barSpacing;
+                        ctx.fillRect(stackXAfter, yOffset - stackHeightAfter, barWidth, stackHeightAfter);
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.save();
+                        ctx.translate(stackXAfter + barWidth / 2, yOffset + 20);
+                        ctx.rotate(-Math.PI / 4);
+                        ctx.fillText(`Stack: ${afterStack} bytes`, 0, 0);
+                        ctx.restore();
+
+                        // Draw legend
+                        ctx.font = axisFont;
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.textAlign = 'left';
+                        ctx.fillText('Legend:', xOffset + 450, 40);
+                        ctx.fillStyle = '#ff5555';
+                        ctx.fillRect(xOffset + 500, 30, 20, 10);
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.fillText('Heap', xOffset + 530, 40);
+                        ctx.fillStyle = '#569cd6';
+                        ctx.fillRect(xOffset + 500, 50, 20, 10);
+                        ctx.fillStyle = '#d4d4d4';
+                        ctx.fillText('Stack', xOffset + 530, 60);
+                    });
+                </script>
+            </div>
+
+            <!-- Optimization Timing Report -->
+            <div class="timing-section col-12">
+                <h2>Optimization Timing</h2>
+                <table class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th>Step</th>
+                            <th>Time (ms)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="entry : ${timingEntries}">
+                            <td th:text="${entry.step}"></td>
+                            <td th:text="${#numbers.formatDecimal(entry.timeMs, 1, 3)}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <!-- Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Diff2Html JS -->
+    <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.35/bundles/js/diff2html.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.35/bundles/js/diff2html-ui.min.js"></script>
+    <!-- JavaScript for Highlight.js, Diff Viewer, and Optimize Edited Code -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Initialize Highlight.js for both code blocks
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+
+            // Handle the "Optimize Edited Code" button click
+            document.getElementById('optimizeEditedButton').addEventListener('click', () => {
+                const editedCode = document.getElementById('originalCode').innerText;
+                const button = document.getElementById('optimizeEditedButton');
+
+                // Show loading state
+                button.disabled = true;
+                button.textContent = 'Optimizing...';
+
+                // Send the edited code to the server as plain text
+                fetch('/optimizeEdited', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: editedCode,
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Update the optimized code block
+                        const optimizedCodeElement = document.getElementById('optimizedCode');
+
+                        // Create a new code element to ensure proper formatting
+                        const newCodeElement = document.createElement('code');
+                        newCodeElement.className = 'language-cpp';
+                        newCodeElement.textContent = data.optimizedCode;
+
+                        // Replace the old code element
+                        optimizedCodeElement.parentNode.replaceChild(newCodeElement, optimizedCodeElement);
+                        newCodeElement.id = 'optimizedCode'; // Restore the ID
+
+                        // Re-apply syntax highlighting to the new element
+                        hljs.highlightElement(newCodeElement);
+
+                        // Update the hidden download input
+                        document.getElementById('downloadCode').value = data.optimizedCode;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while optimizing the code');
+                })
+                .finally(() => {
+                    // Reset button state
+                    button.disabled = false;
+                    button.textContent = 'Optimize Edited Code';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
