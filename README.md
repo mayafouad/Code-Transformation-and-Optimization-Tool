@@ -2,7 +2,7 @@
 
 ![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) 
 
-The **Automated CTO Tool** is a web-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codebases. It features a frontend built with JavaScript and CSS, running on localhost, that accepts file input (e.g., `.c` or `.cpp` files) and processes it using a Spring Boot backend powered by the `CodeOptimizerService`. This tool acts as a virtual "Chief Technology Officer" to enhance code performance, reduce memory usage, and deliver actionable insights.
+The **CTO -Code Transformation and Optimization- Tool** is a web-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codebases. It features a frontend built with JavaScript and CSS, running on localhost, that accepts file input (e.g., `.c` or `.cpp` files) and processes it using a Spring Boot backend powered by the `CodeOptimizerService`. This tool acts as a virtual "Chief Technology Officer" to enhance code performance, reduce memory usage, and deliver actionable insights.
 
 ## ✨Features
 - **Web Interface**: Built with JavaScript and CSS, runs on localhost, and supports file input for C/C++ code.
