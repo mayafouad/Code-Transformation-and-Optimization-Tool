@@ -2,7 +2,7 @@
 
 ![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) 
 
-The **CTO -Code Transformation and Optimization- Tool** is a web-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codes. It features a frontend built with JavaScript and CSS, running on localhost, that accepts file input (`.c` or `.cpp` file) and processes it using a Spring Boot backend powered by the `CodeOptimizerService`. 
+The **CTO -Code Transformation and Optimization- Tool** is a web-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codes. It features a frontend built with JavaScript and CSS, running on localhost, that accepts file input (`.c` or `.cpp` file). The project is structured into modular classes, each responsible for a specific optimization, following the Single Responsibility Principle (SRP). The main entry point is the `CodeOptimizerService`, which orchestrates the optimization process by applying a series of transformations to the input code.
 
 ## ✨Features
 - **Web Interface**: Built with JavaScript and CSS, runs on localhost, and supports file input for C/C++ code.
@@ -86,24 +86,33 @@ You can also optimize code by sending a file via the `/optimize` API endpoint. T
    
 ## 📈Optimization Techniques
 
-### 1. Constant Folding
-Simplifies constant arithmetic expressions (e.g., `2 + 3` becomes `5`).
+### 1. Constant Folding (`ConstantFolder`)
+Constant folding simplifies arithmetic expressions involving constants at compile time, reducing runtime computation.
 
-### 2. Arithmetic Loop Optimization
-Converts summation loops (e.g., `for (int i = 0; i < 5; i++) { sum += i; }`) to direct assignments (e.g., `sum = 10;`).
+### 2. Arithmetic Loop Optimization (`ArithmeticLoopOptimizer`)
+Optimizes loops that perform arithmetic accumulation (e.g., summing numbers) by replacing them with direct assignments using closed-form solutions.
 
-### 3. Dead Code Elimination
-Removes unused variables to streamline the code.
+### 3. Dead Code Elimination (`DeadCodeEliminator`)
+Removes variables that are declared but never used, reducing unnecessary memory usage and improving code clarity.
 
-### 4. Memory Allocation Optimization
-Converts small heap allocations (e.g., `malloc` or `new`) to stack arrays for sizes ≤ 10 elements.
+### 4. Memory Allocation Optimization (`MemoryAllocationOptimizer`)
+Converts small heap allocations (e.g., `malloc` or `new`) to stack allocations when possible, reducing memory management overhead.
 
-### 5. Inline Function Expansion
-Replaces calls to small functions with the function's body to eliminate function call overhead.
-   - Example:
-     ```c
-     int square(int x) { return x * x; }
-     int result = square(5);
+### 5. Function Inlining (`FunctionInliner`)
+Replaces calls to small functions with their bodies, eliminating function call overhead.
+
+### 6. Loop Unrolling (`LoopUnroller`)
+Expands small loops into repeated statements, reducing loop control overhead.
+
+### 7. Common Subexpression Elimination (`CommonSubexpressionEliminator`)
+Removes redundant computations by storing results in temporary variables and reusing them.
+
+### 8. Strength Reduction (`StrengthReducer`)
+Replaces expensive operations (e.g., multiplication) with cheaper ones (e.g., addition) in loops.
+
+### 9. Code Hoisting (`CodeHoister`)
+Moves loop-invariant code (expressions independent of the loop variable) outside the loop to avoid redundant execution.
+
 
 ## 📊Metrics Provided
 - **Memory Usage**: Estimates heap and stack sizes (e.g., `int` = 4 bytes).
@@ -114,15 +123,20 @@ Replaces calls to small functions with the function's body to eliminate function
 
 ### Backend: `CodeOptimizerService`
 - **Location**: `backend/src/main/java/com/example/cppoptimizer/service/CodeOptimizerService.java`
-- **Enums and Nested Classes**:
-  - `Language`: Supports `C` and `CPP`.
-  - `MemoryUsage`: Tracks heap and stack sizes.
-  - `TimingEntry`: Logs time per optimization step.
-  - `OptimizationResult`: Contains optimized code, memory stats, timing, and insights.
-- **Main Method**:
-  - `optimize(String code)`: Processes the code and returns results.
-- **Helper Methods**: `detectLanguage`, `estimateMemoryUsage`, `foldConstants`, etc.
-
+- **`CodeOptimizerService`**: Main service class that coordinates the optimization process.
+- **`LanguageDetector`**: Detects whether the input code is C or C++.
+- **`MemoryAnalyzer`**: Estimates heap and stack memory usage.
+- **`CodeTransformer`**: Abstract base class for all optimization transformers.
+- **Optimization Transformers**: Individual classes for each optimization technique:
+  - `ConstantFolder`
+  - `ArithmeticLoopOptimizer`
+  - `DeadCodeEliminator`
+  - `MemoryAllocationOptimizer`
+  - `FunctionInliner`
+  - `LoopUnroller`
+  - `CommonSubexpressionEliminator`
+  - `StrengthReducer`
+  - `CodeHoister`
 
 ## 🟣Dependencies
 - **Backend**:
@@ -141,6 +155,12 @@ Contributions are welcome! To contribute:
 
 ## 📧Contact
 For questions or feedback, open an issue or reach out via GitHub: [mayafouad](https://github.com/mayafouad).
+
+
+
+
+
+
 
 
 
