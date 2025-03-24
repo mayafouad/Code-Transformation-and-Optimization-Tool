@@ -69,6 +69,13 @@ Removes unused variables to streamline the code.
 ### 4. Memory Allocation Optimization
 Converts small heap allocations (e.g., `malloc` or `new`) to stack arrays for sizes ≤ 10 elements.
 
+### 5. Inline Function Expansion
+Replaces calls to small functions with the function's body to eliminate function call overhead.
+   - Example:
+     ```c
+     int square(int x) { return x * x; }
+     int result = square(5);
+
 ## Metrics Provided
 - **Memory Usage**: Estimates heap and stack sizes (e.g., `int` = 4 bytes).
 - **Timing**: Tracks time (in milliseconds) for each optimization step and total process.
