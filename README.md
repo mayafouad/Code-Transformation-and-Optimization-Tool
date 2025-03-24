@@ -1,12 +1,12 @@
-
 # Automated CTO Tool
 
-![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) ![License](https://img.shields.io/badge/License-MIT-blue)
+![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow) ![CSS](https://img.shields.io/badge/CSS-3-blue) ![License](https://img.shields.io/badge/License-MIT-blue)
 
-The **Automated CTO Tool** is a Spring-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codebases. It leverages the `CodeOptimizerService` to enhance code performance, reduce memory usage, and provide actionable insights—acting as a virtual "Chief Technology Officer" for your project.
+The **Automated CTO Tool** is a web-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codebases. It features a frontend built with JavaScript and CSS, running on localhost, that accepts file input (e.g., `.c` or `.cpp` files) and processes it using a Spring Boot backend powered by the `CodeOptimizerService`. This tool acts as a virtual "Chief Technology Officer" to enhance code performance, reduce memory usage, and deliver actionable insights.
 
 ## Features
-- **Code Optimization**: Applies techniques like constant folding, loop optimization, dead code elimination, and memory allocation improvements.
+- **Web Interface**: Built with JavaScript and CSS, runs on localhost, and supports file input for C/C++ code.
+- **Code Optimization**: Applies constant folding, loop optimization, dead code elimination, and memory allocation improvements.
 - **Language Support**: Automatically detects and optimizes C and C++ code.
 - **Metrics & Insights**:
   - Estimates heap and stack memory usage before and after optimization.
@@ -16,9 +16,8 @@ The **Automated CTO Tool** is a Spring-based application designed to assist deve
 ## Installation
 
 ### Prerequisites
-- Java 17+
-- Maven 3.6+
-- Spring Boot 2.7+
+- **Backend**: Java 17+, Maven 3.6+, Spring Boot 2.7+
+- **Frontend**: A modern web browser (no additional setup required beyond serving the files)
 
 ### Steps
 1. **Clone the Repository**:
@@ -27,39 +26,33 @@ The **Automated CTO Tool** is a Spring-based application designed to assist deve
    cd Automated-CTO-Tool
    ```
 
-2. **Build the Project**:
+2. **Build and Run the Backend**:
    ```bash
+   cd backend
    mvn clean install
-   ```
-
-3. **Run the Application**:
-   ```bash
    mvn spring-boot:run
    ```
+   - The backend runs on `http://localhost:8080`.
+
+4. **Access the Tool**:
+   - Open `http://localhost:8080` in your browser.
 
 ## Usage
 
-### Inject the Optimizer Service
-The core of the tool is the `CodeOptimizerService`, a Spring `@Service` that you can inject into your components:
+### Via the Web Interface
+1. **Upload a File**: Use the file input field to upload a `.c` or `.cpp` file containing your code.
+2. **Optimize**: Click the "Optimize" button to process the file.
+3. **View Results**: The optimized code, memory usage, timing, and insights will be displayed on the page.
+
+### Backend Usage (For Developers)
+Inject the `CodeOptimizerService` into your Spring components:
 ```java
 @Autowired
 private CodeOptimizerService optimizerService;
-```
 
-### Optimize Code
-Pass your C/C++ code as a string to the `optimize` method:
-```java
-String code = "int main() {\n  int a = 2 + 3;\n  int sum = 0;\n  for (int i = 0; i < 5; i++) { sum += i; }\n  return 0;\n}";
+String code = "int main() { int a = 2 + 3; return 0; }";
 OptimizationResult result = optimizerService.optimize(code);
-```
-
-### Access Results
-Retrieve the optimized code, memory stats, timing, and insights:
-```java
 System.out.println("Optimized Code: " + result.getOptimizedCode());
-System.out.println("Heap Before: " + result.getBeforeMemory().getHeapSize());
-System.out.println("Heap After: " + result.getAfterMemory().getHeapSize());
-System.out.println("Insights: " + result.getOptimizationInsights());
 ```
 
 ## Optimization Techniques
@@ -68,7 +61,7 @@ System.out.println("Insights: " + result.getOptimizationInsights());
 Simplifies constant arithmetic expressions (e.g., `2 + 3` becomes `5`).
 
 ### 2. Arithmetic Loop Optimization
-Converts summation loops (e.g., `for (int i = 0; i < 5; i++) { sum += i; }`) into direct assignments (e.g., `sum = 10;`).
+Converts summation loops (e.g., `for (int i = 0; i < 5; i++) { sum += i; }`) to direct assignments (e.g., `sum = 10;`).
 
 ### 3. Dead Code Elimination
 Removes unused variables to streamline the code.
@@ -83,7 +76,7 @@ Converts small heap allocations (e.g., `malloc` or `new`) to stack arrays for si
 
 ## Example
 
-### Input Code
+### Input File (`example.c`)
 ```cpp
 int main() {
     int a = 2 + 3;
@@ -95,7 +88,7 @@ int main() {
 }
 ```
 
-### Output
+### Output (Displayed on Web Interface)
 - **Optimized Code**:
   ```cpp
   int main() {
@@ -115,37 +108,22 @@ int main() {
 
 ## Project Structure
 
-### Core Component: `CodeOptimizerService`
+### Backend: `CodeOptimizerService`
+- **Location**: `backend/src/main/java/com/example/cppoptimizer/service/CodeOptimizerService.java`
 - **Enums and Nested Classes**:
   - `Language`: Supports `C` and `CPP`.
   - `MemoryUsage`: Tracks heap and stack sizes.
   - `TimingEntry`: Logs time per optimization step.
   - `OptimizationResult`: Contains optimized code, memory stats, timing, and insights.
-
 - **Main Method**:
-  - `optimize(String code)`: Applies optimizations and returns results.
+  - `optimize(String code)`: Processes the code and returns results.
+- **Helper Methods**: `detectLanguage`, `estimateMemoryUsage`, `foldConstants`, etc.
 
-- **Helper Methods**:
-  - `detectLanguage`: Identifies C or C++.
-  - `estimateMemoryUsage`: Estimates memory usage.
-  - `foldConstants`: Folds constants.
-  - `optimizeArithmeticLoops`: Optimizes loops.
-  - `eliminateDeadCode`: Removes dead code.
-  - `optimizeMemoryAllocation`: Optimizes memory usage.
-
-## Limitations
-- **Memory Estimation**: Uses fixed sizes (e.g., `int` = 4 bytes) and may not reflect platform-specific variations.
-- **Pattern Matching**: Relies on regex, potentially missing complex code structures.
-- **Allocation Threshold**: Heap-to-stack conversion is capped at 10 elements.
 
 ## Dependencies
-- **Spring Framework**: For `@Service` and dependency injection.
-- **SLF4J**: For logging optimization steps.
-
-## Extending the Tool
-- Add new optimization techniques in `optimize`.
-- Enhance `estimateMemoryUsage` for platform-specific accuracy.
-- Improve regex patterns to handle more code patterns.
+- **Backend**:
+  - Spring Framework (for `@Service` and dependency injection)
+  - SLF4J (for logging)
 
 ## Contributing
 Contributions are welcome! To contribute:
