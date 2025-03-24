@@ -1,6 +1,6 @@
 # Automated CTO Tool
 
-![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow) ![CSS](https://img.shields.io/badge/CSS-3-blue) ![License](https://img.shields.io/badge/License-MIT-blue)
+![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) 
 
 The **Automated CTO Tool** is a web-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codebases. It features a frontend built with JavaScript and CSS, running on localhost, that accepts file input (e.g., `.c` or `.cpp` files) and processes it using a Spring Boot backend powered by the `CodeOptimizerService`. This tool acts as a virtual "Chief Technology Officer" to enhance code performance, reduce memory usage, and deliver actionable insights.
 
@@ -133,8 +133,6 @@ Contributions are welcome! To contribute:
 4. Push to the branch (`git push origin feature/your-feature`).
 5. Open a Pull Request.
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 For questions or feedback, open an issue or reach out via GitHub: [mayafouad](https://github.com/mayafouad).
