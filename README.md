@@ -1,6 +1,6 @@
 # ⚡CTO Tool
 
-![Java](https://img.shields.io/badge/Java-17-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) 
+![Java](https://img.shields.io/badge/Java-21-orange) ![Spring](https://img.shields.io/badge/Spring-5.3-green) 
 
 The **CTO -Code Transformation and Optimization- Tool** is a web-based application designed to assist developers and technical leads by providing automated code optimization and analysis for C and C++ codes. It features a frontend built with JavaScript and CSS, running on localhost, that accepts file input (`.c` or `.cpp` file). The project is structured into modular classes, each responsible for a specific optimization, following the Single Responsibility Principle (SRP). The main entry point is the `CodeOptimizerService`, which orchestrates the optimization process by applying a series of transformations to the input code.
 
