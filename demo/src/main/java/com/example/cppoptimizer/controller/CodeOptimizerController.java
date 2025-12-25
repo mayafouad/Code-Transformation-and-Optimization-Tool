@@ -58,6 +58,7 @@ public class CodeOptimizerController {
         }
     }
 
+    @SuppressWarnings("null")
     @GetMapping("/download")
     public ResponseEntity<ByteArrayResource> downloadCode(@RequestParam("code") String code, @RequestParam("filename") String filename) {
         byte[] codeBytes = code.getBytes(StandardCharsets.UTF_8);

@@ -1,4 +1,5 @@
-package com.example.cppoptimizer.service;
+package com.example.cppoptimizer.service.CodeTransformer;
+import com.example.cppoptimizer.service.CodeOptimizerService;
 
 public abstract class CodeTransformer {
     public abstract String transform(String code, CodeOptimizerService.Language lang);

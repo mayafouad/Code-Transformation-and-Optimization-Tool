@@ -1,7 +1,9 @@
-package com.example.cppoptimizer.service;
+package com.example.cppoptimizer.service.CodeTransformer;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.example.cppoptimizer.service.CodeOptimizerService;
 
 public class ArithmeticLoopOptimizer extends CodeTransformer {
     @Override

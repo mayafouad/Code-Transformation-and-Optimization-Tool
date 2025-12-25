@@ -7,6 +7,16 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.cppoptimizer.service.CodeTransformer.CodeTransformer;
+import com.example.cppoptimizer.service.CodeTransformer.ConstantFolder;
+import com.example.cppoptimizer.service.CodeTransformer.ArithmeticLoopOptimizer;
+import com.example.cppoptimizer.service.CodeTransformer.DeadCodeEliminator;
+import com.example.cppoptimizer.service.CodeTransformer.MemoryAllocationOptimizer;
+import com.example.cppoptimizer.service.CodeTransformer.FunctionInliner;
+import com.example.cppoptimizer.service.CodeTransformer.LoopUnroller;
+import com.example.cppoptimizer.service.CodeTransformer.CommonSubexpressionEliminator;
+import com.example.cppoptimizer.service.CodeTransformer.CodeHoister;
+
 @Service
 public class CodeOptimizerService {
     private static final Logger logger = LoggerFactory.getLogger(CodeOptimizerService.class);
